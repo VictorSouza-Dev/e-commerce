@@ -1,10 +1,10 @@
-package org.example.ecommerce.model;
+package org.example.ecommerce.domain.entities;
 
 import jakarta.persistence.*;
-import jakarta.validation.constraints.NotNull;
-import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+
+import java.util.UUID;
 
 @Entity
 @Table(name = "users")
@@ -26,4 +26,15 @@ public class User {
 
     @Column(nullable = false)
     private String phone;
+
+    @Column(nullable = false)
+    private UUID userIdentifier;
+
+    @Column(nullable = false)
+    private Boolean active = true;
+
+    @PrePersist
+    public void prePersist(){
+        userIdentifier = UUID.randomUUID();
+    }
 }
