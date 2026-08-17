@@ -1,8 +1,15 @@
 package org.example.ecommerce.api.controller;
 
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
-import org.apache.coyote.Response;
+import org.example.ecommerce.api.swagger.annotations.responses.BadRequestResponse;
+import org.example.ecommerce.api.swagger.annotations.responses.NotFoundResponse;
 import org.example.ecommerce.application.useCases.item.deleteById.DeleteItemByIdUseCase;
 import org.example.ecommerce.application.useCases.item.getById.GetItemByIdUseCase;
 import org.example.ecommerce.application.useCases.item.register.RegisterItemUseCase;
@@ -18,6 +25,7 @@ import java.util.UUID;
 
 @RestController
 @RequestMapping("/item")
+@Tag(name= "item")
 public class ItemController {
 
     private final RegisterItemUseCase registerItemUseCase;
@@ -34,7 +42,21 @@ public class ItemController {
         this.deleteItemByIdUseCase =  deleteItemByIdUseCase;
     }
 
+
     @PostMapping
+    @Operation(
+            security = {
+                    @SecurityRequirement(name = "bearer-key")
+            }
+    )
+    @ApiResponse(
+            responseCode = "201",
+            content = @Content(
+                    mediaType = "application/json",
+                    schema = @Schema(implementation = ResponseRegisteredItemJson.class)
+            )
+    )
+    @BadRequestResponse
     public ResponseEntity<ResponseRegisteredItemJson> register(
             @Valid  @RequestPart("data") RequestItemJson request,
             @RequestPart("image") MultipartFile image
@@ -45,6 +67,19 @@ public class ItemController {
     }
 
     @GetMapping("/{id}")
+    @Operation(
+            security = {
+                    @SecurityRequirement(name = "bearer-key")
+            }
+    )
+    @ApiResponse(
+            responseCode = "200",
+            content = @Content(
+                    mediaType = "application/json",
+                    schema = @Schema(implementation = ResponseRegisteredItemJson.class)
+            )
+    )
+    @NotFoundResponse
     public ResponseEntity<ResponseRegisteredItemJson> getItem(
             @PathVariable UUID id
     ){
@@ -54,6 +89,15 @@ public class ItemController {
     }
 
     @DeleteMapping("/{id}")
+    @Operation(
+            security = {
+                    @SecurityRequirement(name = "bearer-key")
+            }
+    )
+    @ApiResponse(
+            responseCode = "204"
+    )
+    @NotFoundResponse
     public ResponseEntity<?> deleteItem(
             @PathVariable UUID id
     ){

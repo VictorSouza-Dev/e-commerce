@@ -1,7 +1,12 @@
 package org.example.ecommerce.api.controller;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
+import org.example.ecommerce.api.swagger.annotations.responses.BadRequestResponse;
 import org.example.ecommerce.application.useCases.user.profile.GetUserProfileUseCase;
 import org.example.ecommerce.application.useCases.user.register.RegisterUserUseCase;
 import org.example.ecommerce.shared.communication.request.user.RequestRegisterUserJson;
@@ -28,6 +33,16 @@ public class UserController {
         this.getUserProfileUseCase = getUserProfileUseCase;
     }
 
+    @Operation(
+            summary = "get user logged"
+    )
+    @ApiResponse(
+            responseCode = "200",
+            content = @Content(
+                mediaType = "application/json",
+                    schema = @Schema(implementation = ResponseUserProfileJson.class)
+            )
+    )
     @GetMapping
     @PreAuthorize("isAuthenticated()")
     public ResponseEntity<ResponseUserProfileJson> getUserProfile(){
@@ -36,6 +51,14 @@ public class UserController {
         return ResponseEntity.status(HttpStatus.OK).body(response);
     }
 
+    @ApiResponse(
+           responseCode = "201",
+            content = @Content(
+                    mediaType = "application/json",
+                    schema =  @Schema(implementation = ResponseUserProfileJson.class)
+            )
+    )
+    @BadRequestResponse
     @PostMapping
     public ResponseEntity<ResponseRegisteredUserJson> add(
             @Valid @RequestBody RequestRegisterUserJson request

@@ -9,7 +9,7 @@ public class ResponseErrorJson {
     private final List<String> errors;
 
     @Getter
-    private boolean tokenExpired;
+    private boolean tokenExpired = false;
 
     public ResponseErrorJson(List<String> errors) {
         this.errors = errors;
