@@ -3,10 +3,9 @@ package org.example.ecommerce.application.useCases.item.register;
 import jakarta.transaction.Transactional;
 import org.example.ecommerce.application.dto.ImageValidationResult;
 import org.example.ecommerce.application.extensions.StreamImageExtensions;
-import org.example.ecommerce.application.services.mapper.AutoMapping;
+import org.example.ecommerce.application.mapper.ItemMapper;
 import org.example.ecommerce.domain.entities.Category;
 import org.example.ecommerce.domain.entities.Item;
-import org.example.ecommerce.domain.entities.User;
 import org.example.ecommerce.domain.enums.Condition;
 import org.example.ecommerce.domain.repositories.category.CategoryRepository;
 import org.example.ecommerce.domain.repositories.item.ItemRepository;
@@ -17,9 +16,7 @@ import org.example.ecommerce.shared.communication.response.item.ResponseRegister
 import org.example.ecommerce.shared.exception.ErrorOnValidationException;
 import org.example.ecommerce.shared.exception.NotFoundException;
 import org.springframework.stereotype.Service;
-import org.springframework.web.multipart.MultipartFile;
 
-import java.io.IOException;
 import java.text.Normalizer;
 import java.util.List;
 import java.util.UUID;
@@ -30,14 +27,14 @@ public class RegisterItemUseCase {
 
     private final ItemRepository itemRepository;
     private final CategoryRepository categoryRepository;
-    private final AutoMapping mapper;
+    private final ItemMapper mapper;
     private final ImageStoragePort imageStorage;
     private final LoggedUser loggedUser;
 
     public RegisterItemUseCase(
             ItemRepository itemRepository,
             CategoryRepository categoryRepository,
-            AutoMapping mapper,
+            ItemMapper mapper,
             ImageStoragePort imageStorage,
             LoggedUser loggedUser
     ){
@@ -53,7 +50,7 @@ public class RegisterItemUseCase {
             RequestItemJson request,
             byte[] image
     ) {
-        validateRequest(request);
+        ValidateAndThrowOnFailures(request);
 
         var userLogged = loggedUser.getLoggedUser().get();
 
@@ -72,7 +69,7 @@ public class RegisterItemUseCase {
         return buildResponse(item);
     }
 
-    private void validateRequest(RequestItemJson request) {
+    private void ValidateAndThrowOnFailures(RequestItemJson request) {
         if (request.getCategoryId() == null && request.getNewCategoryName() == null) {
             throw new ErrorOnValidationException(
                     List.of("Passe ao menos o id ou o nome da categoria que deseja criar.")

@@ -1,6 +1,6 @@
 package org.example.ecommerce.application.useCases.user.profile;
 
-import org.example.ecommerce.application.services.mapper.AutoMapping;
+import org.example.ecommerce.application.mapper.UserMapper;
 import org.example.ecommerce.domain.entities.User;
 import org.example.ecommerce.domain.services.loggedUser.LoggedUser;
 import org.example.ecommerce.shared.communication.response.user.ResponseUserProfileJson;
@@ -11,11 +11,11 @@ import org.springframework.stereotype.Service;
 public class GetUserProfileUseCase {
 
     private LoggedUser loggedUser;
-    private final AutoMapping mapper;
+    private final UserMapper mapper;
 
     public GetUserProfileUseCase(
             LoggedUser loggedUser,
-            AutoMapping mapper
+            UserMapper mapper
     ) {
         this.loggedUser = loggedUser;
         this.mapper = mapper;
@@ -25,6 +25,6 @@ public class GetUserProfileUseCase {
 
         User user = loggedUser.getLoggedUser().orElseThrow(() -> new InvalidLoginException());
 
-        return mapper.userToResponse(user);
+        return mapper.toResponse(user);
     }
 }

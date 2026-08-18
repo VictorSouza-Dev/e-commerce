@@ -5,6 +5,7 @@ import org.example.ecommerce.domain.repositories.item.ItemRepository;
 import org.example.ecommerce.infraestructure.persistence.SpringDataItemRepository;
 import org.springframework.stereotype.Repository;
 
+import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -30,5 +31,10 @@ public class JpaItemRepository implements ItemRepository {
     @Override
     public void delete(Item item) {
         repository.delete(item);
+    }
+
+    @Override
+    public List<Item> getAll() {
+        return repository.findAll();
     }
 }

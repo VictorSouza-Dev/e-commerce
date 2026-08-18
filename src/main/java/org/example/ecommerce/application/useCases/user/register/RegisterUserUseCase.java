@@ -1,6 +1,6 @@
 package org.example.ecommerce.application.useCases.user.register;
 
-import org.example.ecommerce.application.services.mapper.AutoMapping;
+import org.example.ecommerce.application.mapper.UserMapper;
 import org.example.ecommerce.domain.security.cryptography.PasswordEncripter;
 import org.example.ecommerce.domain.security.tokens.AccessTokenGenerator;
 import org.example.ecommerce.shared.communication.request.user.RequestRegisterUserJson;
@@ -16,13 +16,13 @@ import java.util.List;
 public class RegisterUserUseCase {
 
     private final UserRepository repository;
-    private final AutoMapping mapper;
+    private final UserMapper mapper;
     private final AccessTokenGenerator accessTokenGenerator;
     private final PasswordEncripter  passwordEncripter;
 
     public RegisterUserUseCase(
             UserRepository repository,
-            AutoMapping mapper,
+            UserMapper mapper,
             AccessTokenGenerator accessTokenGenerator,
             PasswordEncripter passwordEncripter
     ) {
@@ -38,7 +38,7 @@ public class RegisterUserUseCase {
             throw new ErrorOnValidationException(List.of("Email já cadastrado"));
         }
 
-        var user = mapper.requestRegisterUserToUser(request);
+        var user = mapper.toUser(request);
         user.setPassword(passwordEncripter.encrypt(request.getPassword()));
 
         repository.save(user);

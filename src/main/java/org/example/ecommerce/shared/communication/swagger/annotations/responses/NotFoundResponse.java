@@ -1,4 +1,4 @@
-package org.example.ecommerce.api.swagger.annotations.responses;
+package org.example.ecommerce.shared.communication.swagger.annotations.responses;
 
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;

@@ -45,7 +45,6 @@ dependencies {
     implementation("org.springdoc:springdoc-openapi-starter-webmvc-ui:2.8.9")
     implementation 'org.springframework.boot:spring-boot-starter-amqp'
     implementation 'com.cloudinary:cloudinary-http5:2.4.0'
-    implementation 'org.springframework.boot:spring-boot-starter-web'
 }
 
 tasks.named('test') {
