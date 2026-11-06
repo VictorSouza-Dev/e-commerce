@@ -23,7 +23,7 @@ public class GetUserProfileUseCase {
 
     public ResponseUserProfileJson execute(){
 
-        User user = loggedUser.getLoggedUser().orElseThrow(() -> new InvalidLoginException());
+        User user = loggedUser.getLoggedUser();
 
         return mapper.toResponse(user);
     }

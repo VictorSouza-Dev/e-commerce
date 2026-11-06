@@ -1,19 +1,43 @@
 package org.example.ecommerce.api.token;
 
+import jakarta.servlet.http.Cookie;
+import jakarta.servlet.http.HttpServletRequest;
 import org.example.ecommerce.domain.security.tokens.TokenProvider;
 import org.springframework.stereotype.Component;
-import org.springframework.web.context.request.RequestContextHolder;
-import org.springframework.web.context.request.ServletRequestAttributes;
+import org.springframework.web.context.annotation.RequestScope;
+
+import java.util.Arrays;
 
 @Component
+@RequestScope
 public class HttpContextTokenValue implements TokenProvider {
 
+    private final HttpServletRequest request;
+
+    public HttpContextTokenValue(HttpServletRequest request) {
+        this.request = request;
+    }
+
     @Override
-    public String value(){
-        var attributes = (ServletRequestAttributes)RequestContextHolder.getRequestAttributes();
+    public String value() {
+        Cookie[] cookies = request.getCookies();
+        if (cookies != null) {
+            String tokenFromCookie = Arrays.stream(cookies)
+                    .filter(cookie -> "access_Token".equalsIgnoreCase(cookie.getName()))
+                    .findFirst()
+                    .map(Cookie::getValue)
+                    .orElse(null);
 
-        var authorization = attributes.getRequest().getHeader("Authorization");
+            if (tokenFromCookie != null && !tokenFromCookie.isBlank()) {
+                return tokenFromCookie;
+            }
+        }
 
-        return authorization.contains("Bearer") ? authorization.substring(7).trim() : authorization;
+        String authHeader = request.getHeader("Authorization");
+        if (authHeader != null && authHeader.startsWith("Bearer ")) {
+            return authHeader.substring(7);
+        }
+
+        return null;
     }
 }

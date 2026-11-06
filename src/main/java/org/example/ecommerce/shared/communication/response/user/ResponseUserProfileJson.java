@@ -11,6 +11,8 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @Builder
 public class ResponseUserProfileJson {
-    private String name;
-    private String email;
+    private String firstName;
+    private String lastName;
+    private String phoneNumber;
+    private String dateOfBirth;
 }

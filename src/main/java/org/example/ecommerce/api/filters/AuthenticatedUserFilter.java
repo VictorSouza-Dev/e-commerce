@@ -1,38 +1,49 @@
 package org.example.ecommerce.api.filters;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.example.ecommerce.domain.repositories.user.UserRepository;
 import org.example.ecommerce.domain.security.tokens.AccessTokenValidator;
+import org.example.ecommerce.domain.security.tokens.TokenProvider;
 import org.example.ecommerce.shared.communication.response.ResponseErrorJson;
+import org.springframework.lang.NonNull;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
-import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
-import tools.jackson.databind.ObjectMapper;
 
 import java.io.IOException;
 import java.util.Collections;
 import java.util.List;
 
-@Component
 public class AuthenticatedUserFilter extends OncePerRequestFilter {
 
     private final AccessTokenValidator validator;
     private final UserRepository repository;
+    private final TokenProvider tokenProvider;
     private final ObjectMapper mapper;
 
     public AuthenticatedUserFilter(
             AccessTokenValidator validator,
             UserRepository repository,
+            TokenProvider tokenProvider,
             ObjectMapper mapper
-    ){
+    ) {
         this.validator = validator;
         this.repository = repository;
+        this.tokenProvider = tokenProvider;
         this.mapper = mapper;
+    }
+
+    @Override
+    protected boolean shouldNotFilter(HttpServletRequest request) {
+        String path = request.getServletPath();
+        String method = request.getMethod();
+
+        return method.equalsIgnoreCase("OPTIONS") || path.startsWith("/auth");
     }
 
     @Override
@@ -42,19 +53,18 @@ public class AuthenticatedUserFilter extends OncePerRequestFilter {
             FilterChain filterChain
     ) throws ServletException, IOException {
 
-        var token = tokenOnRequest(request);
+        var token = tokenProvider.value();
 
-        if(token == null){
+        if (token == null || token.isBlank()) {
             filterChain.doFilter(request, response);
             return;
         }
 
-        try{
+        try {
             var userIdentifier = validator.validateAndGetUserIdentifier(token);
-
             var exist = repository.existsActiveUserByIdentifier(userIdentifier);
 
-            if(!exist){
+            if (!exist) {
                 writeResponseErrorMessage(response);
                 return;
             }
@@ -69,20 +79,9 @@ public class AuthenticatedUserFilter extends OncePerRequestFilter {
 
             filterChain.doFilter(request, response);
 
-        }catch (Exception e){
+        } catch (Exception e) {
             writeResponseErrorMessage(response);
-            return;
         }
-    }
-
-    private String tokenOnRequest(HttpServletRequest request) {
-        var token = request.getHeader("Authorization");
-
-        if (token == null || !token.startsWith("Bearer ")) {
-            return null;
-        }
-
-        return token.substring(7);
     }
 
     private void writeResponseErrorMessage(
@@ -95,10 +94,5 @@ public class AuthenticatedUserFilter extends OncePerRequestFilter {
         response.setContentType("application/json");
         response.setCharacterEncoding("UTF-8");
         response.getWriter().write(json);
-    }
-
-    @Override
-    protected boolean shouldNotFilter(HttpServletRequest request) {
-        return request.getServletPath().startsWith("/auth");
     }
 }

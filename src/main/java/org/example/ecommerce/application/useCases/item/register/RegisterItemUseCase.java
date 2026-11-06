@@ -52,7 +52,7 @@ public class RegisterItemUseCase {
     ) {
         ValidateAndThrowOnFailures(request);
 
-        var userLogged = loggedUser.getLoggedUser().get();
+        var userLogged = loggedUser.getLoggedUser();
 
         var imageInfo = validateImage(image);
 

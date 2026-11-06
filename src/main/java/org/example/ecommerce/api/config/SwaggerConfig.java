@@ -1,4 +1,4 @@
-package org.example.ecommerce.api.swagger;
+package org.example.ecommerce.api.config;
 
 import io.swagger.v3.oas.models.Components;
 import io.swagger.v3.oas.models.OpenAPI;
@@ -8,7 +8,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
 @Configuration
-public class OpenApiConfig {
+public class SwaggerConfig {
 
     @Bean
     public OpenAPI customOpenAPI() {
@@ -18,7 +18,6 @@ public class OpenApiConfig {
                         .version("1.0")
                         .description("API do sistema e-commerce")
                 )
-                // configuration jwt
                 .components(new Components()
                                 .addSecuritySchemes(
                                         "bearer-Key",

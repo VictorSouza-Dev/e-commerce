@@ -1,4 +1,4 @@
-package org.example.ecommerce.api.filters;
+package org.example.ecommerce.api.exception;
 
 import org.example.ecommerce.shared.exception.ExceptionBaseProject;
 import org.springframework.http.ResponseEntity;

@@ -9,11 +9,15 @@ import org.example.ecommerce.shared.communication.swagger.annotations.responses.
 import org.example.ecommerce.application.useCases.login.doLogin.DoLoginUseCase;
 import org.example.ecommerce.shared.communication.request.user.RequestLoginJson;
 import org.example.ecommerce.shared.communication.response.user.ResponseRegisteredUserJson;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.ResponseCookie;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+
+import java.time.Duration;
 
 @RestController
 @RequestMapping("/auth")
@@ -42,6 +46,16 @@ public class AuthController {
     ){
         var response = doLoginUseCase.execute(request);
 
-        return ResponseEntity.ok(response);
+        var cookie = ResponseCookie.from("access_Token",
+                response.getTokens().getAccessToken())
+                .httpOnly(true)
+                .secure(false)
+                .sameSite("Lax")
+                .path("/")
+                .maxAge(Duration.ofHours(1))
+                .build();
+
+
+        return ResponseEntity.ok().header(HttpHeaders.SET_COOKIE, cookie.toString()).body(response);
     }
 }
